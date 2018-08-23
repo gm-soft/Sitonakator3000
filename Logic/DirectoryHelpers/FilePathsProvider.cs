@@ -30,30 +30,23 @@ namespace Logic.DirectoryHelpers
         // https://social.msdn.microsoft.com/Forums/vstudio/en-US/dab86e37-a25b-4bdb-9552-7e6c7ed509c7/how-to-copy-files-and-directories-recursively?forum=csharpgeneral
         private void PerformDeepCopy(string sourceDirectory, string destinationDirectory, ref List<FileCopyInfo> results)
         {
-            if (ExpectedLevelReached(destinationDirectory))
-            {
-                return;
-            }
+            //if (ExpectedLevelReached(destinationDirectory))
+            //    return;
+
             if (!Directory.Exists(destinationDirectory))
-            {
                 Directory.CreateDirectory(destinationDirectory);
-            }
+
             var sourceDir = new DirectoryInfo(sourceDirectory);
             var targetDir = new DirectoryInfo(destinationDirectory);
 
             FileInfo[] fileInfos = sourceDir.GetFiles();
 
             foreach (FileInfo fileInfo in fileInfos)
-            {
-                string pathToCopy = Path.Combine(targetDir.ToString(), fileInfo.Name);
-
-                results.Add(new FileCopyInfo(fileInfo, pathToCopy));
-                //fileInfo.CopyTo(pathToCopy, true);
-            }
+                results.Add(new FileCopyInfo(fileInfo, targetDir));
 
             foreach (DirectoryInfo dir in sourceDir.GetDirectories())
             {
-                var subDirectory = targetDir.CreateSubdirectory(dir.Name);
+                DirectoryInfo subDirectory = targetDir.CreateSubdirectory(dir.Name);
                 PerformDeepCopy(dir.FullName, subDirectory.FullName, ref results);
             }
         }
