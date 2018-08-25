@@ -18,6 +18,7 @@ using Logic;
 using Logic.Arhivator;
 using Logic.DirectoryHelpers;
 using WebsiteReleaseHelper.FormsControlWrappers;
+using WebsiteReleaseHelper.SiteInstances;
 using Path = System.IO.Path;
 using WebsiteArchivator = Logic.Arhivator.WebsiteArchivator;
 
@@ -30,6 +31,8 @@ namespace WebsiteReleaseHelper
     {
         private readonly IGlobalInfo _globalInfo;
 
+        private readonly PrimaryInstanceHelper _primaryInstanceHelper;
+
         private readonly ProgressBarWrapper _primaryInstanceProgressBar;
 
         public MainWindow(IGlobalInfo globalInfo)
@@ -39,65 +42,72 @@ namespace WebsiteReleaseHelper
             _globalInfo = globalInfo;
 
             _primaryInstanceProgressBar = new ProgressBarWrapper(ProgressBar_PrimaryInstance, Dispatcher);
+
+            _primaryInstanceHelper = new PrimaryInstanceHelper(_globalInfo);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var sourceDirectory = _globalInfo.PrimaryInstanceDeployDirectory();
+            var sourceDirectory = _globalInfo.GetConfig("primary_instance_deploy_dir");
             var targetDirectory = _globalInfo.GetConfig("primary_instance_target_dir");
 
             targetDirectory = Path.Combine(targetDirectory, _globalInfo.SiteFolderName());
 
-            var files = new FilesToCopyProvider(sourceDirectory, targetDirectory, _globalInfo.SpecificContentFolderNames()).GetAll();
+            var filesProvider = new FilesToCopyProvider(sourceDirectory, targetDirectory)
+            {
+                DirecoryNamesToIgnore = _globalInfo.SpecificContentFolderNames()
+            };
+
+            var files = filesProvider.GetAll();
             files = files;
         }
 
+        /// <summary>
+        /// Архивирование первичной ноды
+        /// </summary>
         private void Button_ArhivePrimaryInstance_OnClick(object sender, RoutedEventArgs e)
         {
             var archiveFolderPostfix = TextBox_ArchiveFolderPostfix.Text.Trim().ToLowerInvariant();
             if (string.IsNullOrEmpty(archiveFolderPostfix))
                 archiveFolderPostfix = null;
 
-            var websiteDir = new WebsiteArchivator(
-                directoryRootPath: _globalInfo.GetConfig("primary_instance_target_dir"),
-                globalInfo: _globalInfo,
-                archiveFinishedCallback: OnArchiveFinished);
+            _primaryInstanceHelper.Archive(archiveFolderPostfix, archiveFinishedCallback: (archiveResult) =>
+            {
+                UpdateInUiThread(() =>
+                {
+                    _primaryInstanceProgressBar.Stop();
 
-            websiteDir.Arhive(archiveFolderPostfix);
+                    var messageToShow = archiveResult.Result
+                        ? "Архив сделан успешно"
+                        : $"Произошла ошибка при архивировании: {archiveResult.Exception.Message}";
+
+                    Label_StatusBarInfo.Content = messageToShow;
+                });
+            });
 
             _primaryInstanceProgressBar.Start();
 
             Label_StatusBarInfo.Content = "Начинаю архивировать первичную ноду";
         }
 
-        private void OnArchiveFinished(ArchiveResult result)
-        {
-            UpdateInUiThread(() =>
-            {
-                _primaryInstanceProgressBar.Stop();
-
-                var messageToShow = result.Result 
-                    ? "Архив сделан успешно" 
-                    : $"Произошла ошибка при архивировании: {result.Exception.Message}";
-
-                Label_StatusBarInfo.Content = messageToShow;
-            });
-        }
-
-        private void UpdateInUiThread(Action action)
-        {
-            Dispatcher.Invoke(action);
-        }
-
         private void Button_CopyPrimaryNewFiles_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            _primaryInstanceHelper.CopyFilesFromDeployDirectory();
         }
 
         private void Button_OpenPrimaryInstancePage_OnClick(object sender, RoutedEventArgs e)
         {
-            var websiteUrl = _globalInfo.GetConfig("primary_instance_url");
-            Process.Start(websiteUrl);
+            _primaryInstanceHelper.OpenInWebBrowser();
+        }
+
+        /// <summary>
+        /// Выполнение какой-то операции, связанной с UI, в основном потоке.
+        /// Это на случай, если нужно обновить контрол на форме из вторичных потоков
+        /// </summary>
+        /// <param name="action"></param>
+        private void UpdateInUiThread(Action action)
+        {
+            Dispatcher.Invoke(action);
         }
     }
 }

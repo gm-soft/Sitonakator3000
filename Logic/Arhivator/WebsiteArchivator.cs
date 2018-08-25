@@ -12,16 +12,14 @@ namespace Logic.Arhivator
         private readonly string _siteDirectoryPath;
         private readonly string _archDirectoryRootPath;
 
-        private readonly Action<ArchiveResult> _archiveFinishedCallback;
-
         private readonly IReadOnlyCollection<string> _direcoryNamesToIgnore;
 
-        public WebsiteArchivator(string directoryRootPath, IGlobalInfo globalInfo, Action<ArchiveResult> archiveFinishedCallback)
+        public WebsiteArchivator(string websiteRootPath, IGlobalInfo globalInfo)
         {
-            if (!Directory.Exists(directoryRootPath))
+            if (!Directory.Exists(websiteRootPath))
                 throw new InvalidOperationException();
 
-            var websiteDirectoryRootPath = directoryRootPath;
+            var websiteDirectoryRootPath = websiteRootPath;
 
             _direcoryNamesToIgnore = globalInfo.SpecificContentFolderNames();
 
@@ -33,11 +31,9 @@ namespace Logic.Arhivator
 
             if (!Directory.Exists(_archDirectoryRootPath))
                 Directory.CreateDirectory(_archDirectoryRootPath);
-
-            _archiveFinishedCallback = archiveFinishedCallback;
         }
 
-        public void Arhive(string archiveFolderNamePostfix)
+        public void Archive(string archiveFolderNamePostfix, Action<ArchiveResult> archiveFinishedCallback)
         {
             if (archiveFolderNamePostfix != null &&
                 string.Equals(archiveFolderNamePostfix.Trim(), string.Empty, StringComparison.InvariantCultureIgnoreCase))
@@ -49,11 +45,11 @@ namespace Logic.Arhivator
                 {
                     await ArchiveAsync(archiveFolderNamePostfix);
                     
-                    _archiveFinishedCallback(ArchiveResult.Success());
+                    archiveFinishedCallback(ArchiveResult.Success());
                 }
                 catch (Exception exception)
                 {
-                    _archiveFinishedCallback(ArchiveResult.Fail(exception));
+                    archiveFinishedCallback(ArchiveResult.Fail(exception));
                 }
             });
         }
@@ -69,10 +65,12 @@ namespace Logic.Arhivator
 
             Directory.CreateDirectory(archiveDirectoryPath);
 
-            IReadOnlyCollection<FileCopyInfo> filesToCopy = new FilesToCopyProvider(
-                _siteDirectoryPath,
-                archiveDirectoryPath,
-                _direcoryNamesToIgnore).GetAll();
+            var filesProvider = new FilesToCopyProvider(_siteDirectoryPath, archiveDirectoryPath)
+            {
+                DirecoryNamesToIgnore = _direcoryNamesToIgnore
+            };
+
+            IReadOnlyCollection<FileCopyInfo> filesToCopy = filesProvider.GetAll();
 
             var tasks = new List<Task>();
             foreach (FileCopyInfo fileCopyInfo in filesToCopy)

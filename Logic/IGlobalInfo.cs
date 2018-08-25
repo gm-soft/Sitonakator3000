@@ -8,12 +8,6 @@ namespace Logic
 
         string SiteArchiveFolderName();
 
-        string PrimaryInstanceDeployDirectory();
-
-        string SecondaryInstanceDeployDirectory();
-
-        string KaspiManagerInstanceDeployDirectory();
-
         IReadOnlyCollection<string> SpecificContentFolderNames();
 
         string GetConfig(string key);

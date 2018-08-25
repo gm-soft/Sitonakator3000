@@ -10,13 +10,12 @@ namespace Logic.DirectoryHelpers
 
         private readonly string _targetDirectory;
 
-        private readonly IReadOnlyCollection<string> _direcoryNamesToIgnore;
+        public IReadOnlyCollection<string> DirecoryNamesToIgnore { private get; set; }
 
-        public FilesToCopyProvider(string sourceDirectory, string targetDirectory, IReadOnlyCollection<string> direcoryNamesToIgnore = null)
+        public FilesToCopyProvider(string sourceDirectory, string targetDirectory)
         {
             _sourceDirectory = sourceDirectory;
             _targetDirectory = targetDirectory;
-            _direcoryNamesToIgnore = direcoryNamesToIgnore;
         }
 
         public IReadOnlyCollection<FileCopyInfo> GetAll()
@@ -53,8 +52,8 @@ namespace Logic.DirectoryHelpers
         private IEnumerable<DirectoryInfo> GetSubDirectoriesWithoutIngored(DirectoryInfo sourceDir)
         {
             var directories = sourceDir.EnumerateDirectories();
-            if (_direcoryNamesToIgnore?.Count > 0)
-                directories = directories.Where(x => !_direcoryNamesToIgnore.Contains(x.Name));
+            if (DirecoryNamesToIgnore?.Count > 0)
+                directories = directories.Where(x => !DirecoryNamesToIgnore.Contains(x.Name));
 
             return directories;
         }

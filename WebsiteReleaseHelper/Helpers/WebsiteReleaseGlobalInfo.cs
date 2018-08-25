@@ -26,36 +26,6 @@ namespace WebsiteReleaseHelper.Helpers
             return _webSiteArchiveDirectoryName;
         }
 
-        private string _primaryInstanceDeployDirectory;
-
-        public string PrimaryInstanceDeployDirectory()
-        {
-            if (_primaryInstanceDeployDirectory == null)
-                _primaryInstanceDeployDirectory = GetConfig("primary_instance_deploy_dir");
-
-            return _primaryInstanceDeployDirectory;
-        }
-
-        private string _secondaryInstanceDeployDirectory;
-
-        public string SecondaryInstanceDeployDirectory()
-        {
-            if (_secondaryInstanceDeployDirectory == null)
-                _secondaryInstanceDeployDirectory = GetConfig("secondary_instance_deploy_dir");
-
-            return _secondaryInstanceDeployDirectory;
-        }
-
-        private string _kaspiManagerInstanceDeployDirectory;
-
-        public string KaspiManagerInstanceDeployDirectory()
-        {
-            if (_kaspiManagerInstanceDeployDirectory == null)
-                _kaspiManagerInstanceDeployDirectory = GetConfig("kaspimanager_instance_deploy_dir");
-
-            return _kaspiManagerInstanceDeployDirectory;
-        }
-
         private IReadOnlyCollection<string> _specificContentFolderNames;
         public IReadOnlyCollection<string> SpecificContentFolderNames()
         {
