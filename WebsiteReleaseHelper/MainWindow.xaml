@@ -8,30 +8,32 @@
         Title="Сайтонакатор 3000" Height="450" Width="884" WindowStartupLocation="CenterScreen">
     <Grid Margin="0,0,2,0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="225*"/>
-            <ColumnDefinition Width="212*"/>
+            <ColumnDefinition Width="450*"/>
+            <ColumnDefinition Width="247*"/>
+            <ColumnDefinition Width="177*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="217*"/>
-            <RowDefinition Height="153*"/>
+            <RowDefinition Height="47*"/>
+            <RowDefinition Height="140*"/>
+            <RowDefinition Height="183*"/>
             <RowDefinition Height="49*"/>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="Первичная нода" Margin="10,10,10,9">
+        <GroupBox Grid.Row="1" Header="Первичная нода" Margin="10,7,10,10">
             <Grid Margin="10,10,8,7">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="57*"/>
                     <ColumnDefinition Width="67*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Архивировать файлы" Margin="10,51,10,0" VerticalAlignment="Top" Name="Button_ArhivePrimaryInstance" Click="Button_ArhivePrimaryInstance_OnClick" Grid.ColumnSpan="2"/>
-                <ProgressBar Margin="10,0,10,10" Height="15" Name="ProgressBar_PrimaryInstance"  VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
-                <Button Content="Перенести задеплоенные файлы" Margin="10,76,10,0" VerticalAlignment="Top" Name="Button_CopyPrimaryNewFiles" Click="Button_CopyPrimaryNewFiles_OnClick" Grid.ColumnSpan="2" />
-                <Button Content="Открыть страницу ноды в веб-браузере" Margin="10,101,10,0" VerticalAlignment="Top" Name="Button_OpenPrimaryInstancePage" Click="Button_OpenPrimaryInstancePage_OnClick" Grid.ColumnSpan="2" />
-                <TextBox Height="26" Margin="10,10,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Column="1" Name="TextBox_ArchiveFolderPostfix"/>
-                <Label Content="Постфикс папки архива" Margin="10,10,10,0" VerticalAlignment="Top"/>
+                <Button Content="Архивировать файлы" Margin="10,10,10,0" VerticalAlignment="Top" Name="Button_ArhivePrimaryInstance" Click="Button_ArhivePrimaryInstance_OnClick" Grid.ColumnSpan="2"/>
+                <Button Content="Перенести задеплоенные файлы" Margin="10,35,10,0" VerticalAlignment="Top" Name="Button_CopyPrimaryNewFiles" Click="Button_CopyPrimaryNewFiles_OnClick" Grid.ColumnSpan="2" />
+                <Button Content="Открыть страницу ноды в веб-браузере" Margin="10,60,10,0" VerticalAlignment="Top" Name="Button_OpenPrimaryInstancePage" Click="Button_OpenPrimaryInstancePage_OnClick" Grid.ColumnSpan="2" />
             </Grid>
         </GroupBox>
-        <StatusBar Grid.Row="2" Grid.ColumnSpan="2"/>
-        <Label Content="" Name="Label_StatusBarInfo" Margin="10,10,10,0" Grid.Row="2" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
+        <StatusBar Grid.Row="3" Grid.ColumnSpan="3"/>
+        <Label Content="" Name="Label_StatusBarInfo" Margin="10,10,10,0" Grid.Row="3" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
+        <ProgressBar x:Name="ProgressBar_Common" Grid.Column="2" Margin="10" Grid.Row="3"/>
+        <TextBox Height="26" Margin="244,10,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" x:Name="TextBox_ArchiveFolderPostfix"/>
+        <Label Content="Постфикс папки архива" Margin="10,10,211,0" VerticalAlignment="Top" Height="26"/>
 
     </Grid>
 </Window>

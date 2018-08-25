@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,7 +9,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Logic;
-using Logic.Arhivator;
 using Logic.SiteInstances;
 using WebsiteReleaseHelper.FormsControlWrappers;
 
@@ -34,7 +27,7 @@ namespace WebsiteReleaseHelper
         {
             InitializeComponent();
 
-            _primaryInstanceProgressBar = new ProgressBarWrapper(ProgressBar_PrimaryInstance, Dispatcher);
+            _primaryInstanceProgressBar = new ProgressBarWrapper(ProgressBar_Common, Dispatcher);
 
             _primaryInstanceHelper = new PrimaryInstanceHelper(globalInfo);
         }
