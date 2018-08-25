@@ -9,7 +9,7 @@ namespace WebsiteReleaseHelper.Helpers
     {
         private string _webSiteCommondDirectoryName;
 
-        public string WebsiteCommonDirectoryName()
+        public string SiteFolderName()
         {
             if (_webSiteCommondDirectoryName == null)
                 _webSiteCommondDirectoryName = GetConfig("website_common_dir");
@@ -18,7 +18,7 @@ namespace WebsiteReleaseHelper.Helpers
         }
 
         private string _webSiteArchiveDirectoryName;
-        public string WebsiteArchiveDirectoryName()
+        public string SiteArchiveFolderName()
         {
             if (_webSiteArchiveDirectoryName == null)
                 _webSiteArchiveDirectoryName = GetConfig("website_arch_dir");
@@ -54,6 +54,15 @@ namespace WebsiteReleaseHelper.Helpers
                 _kaspiManagerInstanceDeployDirectory = GetConfig("kaspimanager_instance_deploy_dir");
 
             return _kaspiManagerInstanceDeployDirectory;
+        }
+
+        private IReadOnlyCollection<string> _specificContentFolderNames;
+        public IReadOnlyCollection<string> SpecificContentFolderNames()
+        {
+            if (_specificContentFolderNames == null)
+                _specificContentFolderNames = GetConfig("specific_content_folder_names").ToLowerInvariant().Split(',');
+
+            return _specificContentFolderNames;
         }
 
         public string GetConfig(string key)

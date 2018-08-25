@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace Logic.DirectoryHelpers
 {
@@ -13,9 +14,9 @@ namespace Logic.DirectoryHelpers
             _copyDestinationFullFilePath = Path.Combine(destinationToCopy.ToString(), fileInfo.Name);
         }
 
-        public void Copy()
+        public async Task<FileInfo> CopyAsync()
         {
-            _fileInfo.CopyTo(destFileName: _copyDestinationFullFilePath, overwrite: true);
+            return await Task.Run(() => _fileInfo.CopyTo(destFileName: _copyDestinationFullFilePath, overwrite: true));
         }
 
         public override string ToString()

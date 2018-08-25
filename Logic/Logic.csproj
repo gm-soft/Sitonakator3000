@@ -41,8 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arhivator\ArchiveResult.cs" />
     <Compile Include="DirectoryHelpers\FileCopyInfo.cs" />
-    <Compile Include="DirectoryHelpers\FilePathsProvider.cs" />
+    <Compile Include="DirectoryHelpers\FilesToCopyProvider.cs" />
+    <Compile Include="Arhivator\WebsiteArchivator.cs" />
     <Compile Include="IGlobalInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

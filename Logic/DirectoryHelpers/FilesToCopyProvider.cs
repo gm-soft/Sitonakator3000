@@ -1,21 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Logic.DirectoryHelpers
 {
-    public class FilePathsProvider
+    public class FilesToCopyProvider
     {
         private readonly string _sourceDirectory;
 
         private readonly string _targetDirectory;
 
-        public FilePathsProvider(string sourceDirectory, string targetDirectory)
+        private readonly IReadOnlyCollection<string> _direcoryNamesToIgnore;
+
+        public FilesToCopyProvider(string sourceDirectory, string targetDirectory, IReadOnlyCollection<string> direcoryNamesToIgnore = null)
         {
             _sourceDirectory = sourceDirectory;
             _targetDirectory = targetDirectory;
+            _direcoryNamesToIgnore = direcoryNamesToIgnore;
         }
 
-        public IReadOnlyCollection<FileCopyInfo> GetAllFilesPaths()
+        public IReadOnlyCollection<FileCopyInfo> GetAll()
         {
             var result = new List<FileCopyInfo>();
             PerformDeepCopyScanning(_sourceDirectory, _targetDirectory, ref result);
@@ -37,11 +41,22 @@ namespace Logic.DirectoryHelpers
             foreach (FileInfo fileInfo in fileInfos)
                 results.Add(new FileCopyInfo(fileInfo, targetDir));
 
-            foreach (DirectoryInfo dir in sourceDir.GetDirectories())
+            IEnumerable<DirectoryInfo> directories = GetSubDirectoriesWithoutIngored(sourceDir);
+
+            foreach (DirectoryInfo dir in directories)
             {
                 DirectoryInfo subDirectory = targetDir.CreateSubdirectory(dir.Name);
                 PerformDeepCopyScanning(dir.FullName, subDirectory.FullName, ref results);
             }
+        }
+
+        private IEnumerable<DirectoryInfo> GetSubDirectoriesWithoutIngored(DirectoryInfo sourceDir)
+        {
+            var directories = sourceDir.EnumerateDirectories();
+            if (_direcoryNamesToIgnore?.Count > 0)
+                directories = directories.Where(x => !_direcoryNamesToIgnore.Contains(x.Name));
+
+            return directories;
         }
     }
 }

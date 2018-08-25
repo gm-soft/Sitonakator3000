@@ -1,16 +1,20 @@
-﻿namespace Logic
+﻿using System.Collections.Generic;
+
+namespace Logic
 {
     public interface IGlobalInfo
     {
-        string WebsiteCommonDirectoryName();
+        string SiteFolderName();
 
-        string WebsiteArchiveDirectoryName();
+        string SiteArchiveFolderName();
 
         string PrimaryInstanceDeployDirectory();
 
         string SecondaryInstanceDeployDirectory();
 
         string KaspiManagerInstanceDeployDirectory();
+
+        IReadOnlyCollection<string> SpecificContentFolderNames();
 
         string GetConfig(string key);
     }
