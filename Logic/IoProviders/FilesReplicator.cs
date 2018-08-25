@@ -12,15 +12,18 @@ namespace Logic.IoProviders
 
         private readonly string _targetDirectory;
 
-        public IReadOnlyCollection<string> DirectoryNamesToIgnore { private get; set; }
-
         private readonly DirectoryHelper _directoryHelper;
 
-        public FilesReplicator(string sourceDirectory, string targetDirectory, DirectoryHelper directoryHelper = null)
+        public FilesReplicator(string sourceDirectory, string targetDirectory, DirectoryHelper directoryHelper)
         {
-            _sourceDirectory = sourceDirectory;
-            _targetDirectory = targetDirectory;
-            _directoryHelper = directoryHelper ?? new DirectoryHelper();
+            _sourceDirectory = sourceDirectory
+                               ?? throw new ArgumentNullException(paramName: nameof(sourceDirectory));
+
+            _targetDirectory = targetDirectory
+                               ?? throw new ArgumentNullException(paramName: nameof(targetDirectory));
+
+            _directoryHelper = directoryHelper 
+                               ?? throw new ArgumentNullException(paramName: nameof(directoryHelper));
         }
 
         public async Task CopyAllAsync()
@@ -58,24 +61,6 @@ namespace Logic.IoProviders
             }
         }
 
-        public async Task RemoveAllContentAsync(string directoryPath)
-        {
-            await Task.Run(() =>
-            {
-                var directoryInfo = new DirectoryInfo(directoryPath);
-
-                // https://stackoverflow.com/a/1288747
-                foreach (FileInfo file in directoryInfo.EnumerateFiles())
-                    file.Delete();
-
-                IEnumerable<DirectoryInfo> dirsToRemove 
-                    = _directoryHelper.GetSubDirectoriesWithoutIngored(directoryInfo, DirectoryNamesToIgnore);
-
-                foreach (DirectoryInfo dir in dirsToRemove)
-                    dir.Delete(true);
-            });
-        }
-
         private IReadOnlyCollection<FileCopyInfo> GetAll()
         {
             var result = new List<FileCopyInfo>();
@@ -86,7 +71,7 @@ namespace Logic.IoProviders
 
         private void CheckSourceDirectoryForContent()
         {
-            if (_directoryHelper.CheckSourceDirectoryForContent(_sourceDirectory, DirectoryNamesToIgnore))
+            if (_directoryHelper.CheckSourceDirectoryForContent(_sourceDirectory))
                 throw new InvalidOperationException($@"В папке-источнике {_sourceDirectory} не обнаружено никаких файлов или папок");
         }
 
@@ -105,7 +90,7 @@ namespace Logic.IoProviders
                 results.Add(new FileCopyInfo(fileInfo, targetDir));
 
             IEnumerable<DirectoryInfo> directories 
-                = _directoryHelper.GetSubDirectoriesWithoutIngored(sourceDir, DirectoryNamesToIgnore);
+                = _directoryHelper.GetSubDirectoriesWithoutIngored(sourceDir);
 
             foreach (DirectoryInfo dir in directories)
             {

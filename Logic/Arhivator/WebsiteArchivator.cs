@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Logic.IoProviders;
 
@@ -12,18 +10,17 @@ namespace Logic.Arhivator
         private readonly string _siteDirectoryPath;
         private readonly string _archDirectoryRootPath;
 
-        private readonly IReadOnlyCollection<string> _directoryNamesToIgnore;
-
         private readonly DirectoryHelper _directoryHelper;
 
-        public WebsiteArchivator(string websiteRootPath, IGlobalInfo globalInfo)
+        public WebsiteArchivator(string websiteRootPath, IGlobalInfo globalInfo, DirectoryHelper directoryHelper)
         {
             if (!Directory.Exists(websiteRootPath))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($@"Указанная папка сайта {websiteRootPath} не существует");
+
+            _directoryHelper = directoryHelper 
+                               ?? throw new ArgumentNullException(paramName: nameof(directoryHelper));
 
             var websiteDirectoryRootPath = websiteRootPath;
-
-            _directoryNamesToIgnore = globalInfo.SpecificContentFolderNames();
 
             _siteDirectoryPath = Path.Combine(websiteDirectoryRootPath, globalInfo.SiteFolderName());
             _archDirectoryRootPath = Path.Combine(websiteDirectoryRootPath, globalInfo.SiteArchiveFolderName());
@@ -33,8 +30,6 @@ namespace Logic.Arhivator
 
             if (!Directory.Exists(_archDirectoryRootPath))
                 Directory.CreateDirectory(_archDirectoryRootPath);
-
-            _directoryHelper = new DirectoryHelper();
         }
 
         public void Archive(string archiveFolderNamePostfix, Action<AsyncActionResult> archiveFinishedCallback)
@@ -70,14 +65,11 @@ namespace Logic.Arhivator
             if (Directory.Exists(archiveDirectoryPath))
                 throw new InvalidOperationException($@"Папка архива {archiveFolderName} уже сущестует. Не могу архивировать");
 
-            var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath, _directoryHelper)
-            {
-                DirectoryNamesToIgnore = _directoryNamesToIgnore
-            };
+            var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath, _directoryHelper);
 
             await filesProvider.CopyAllAsync();
 
-            await filesProvider.RemoveAllContentAsync(_siteDirectoryPath);
+            await _directoryHelper.RemoveAllContentAsync(_siteDirectoryPath);
         }
 
         public static string GetNewFolderNameFromCurrentDate(string archiveFolderNamePostfix = null)
