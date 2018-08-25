@@ -16,6 +16,7 @@
             Remove this element if your application requires this virtualization for backwards
             compatibility.
         -->
+        <!-- Это файл нужен, чтобы при запуске были запрошены права администратора -->
         <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
       </requestedPrivileges>
     </security>

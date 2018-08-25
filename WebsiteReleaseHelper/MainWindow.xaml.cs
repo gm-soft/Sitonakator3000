@@ -102,10 +102,14 @@ namespace WebsiteReleaseHelper
         /// Выполнение какой-то операции, связанной с UI, в основном потоке.
         /// Это на случай, если нужно обновить контрол на форме из вторичных потоков
         /// </summary>
-        /// <param name="action"></param>
         private void UpdateInUiThread(Action action)
         {
             Dispatcher.Invoke(action);
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }
