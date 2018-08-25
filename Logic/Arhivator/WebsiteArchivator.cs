@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Logic.DirectoryHelpers;
+using Logic.IoProviders;
 
 namespace Logic.Arhivator
 {
@@ -13,6 +13,8 @@ namespace Logic.Arhivator
         private readonly string _archDirectoryRootPath;
 
         private readonly IReadOnlyCollection<string> _directoryNamesToIgnore;
+
+        private readonly DirectoryHelper _directoryHelper;
 
         public WebsiteArchivator(string websiteRootPath, IGlobalInfo globalInfo)
         {
@@ -31,6 +33,8 @@ namespace Logic.Arhivator
 
             if (!Directory.Exists(_archDirectoryRootPath))
                 Directory.CreateDirectory(_archDirectoryRootPath);
+
+            _directoryHelper = new DirectoryHelper();
         }
 
         public void Archive(string archiveFolderNamePostfix, Action<AsyncActionResult> archiveFinishedCallback)
@@ -66,9 +70,7 @@ namespace Logic.Arhivator
             if (Directory.Exists(archiveDirectoryPath))
                 throw new InvalidOperationException($@"Папка архива {archiveFolderName} уже сущестует. Не могу архивировать");
 
-            //Directory.CreateDirectory(archiveDirectoryPath);
-
-            var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath)
+            var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath, _directoryHelper)
             {
                 DirectoryNamesToIgnore = _directoryNamesToIgnore
             };

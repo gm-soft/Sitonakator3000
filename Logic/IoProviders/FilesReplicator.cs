@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Logic.Arhivator;
 
-namespace Logic.DirectoryHelpers
+namespace Logic.IoProviders
 {
     public class FilesReplicator
     {
@@ -15,26 +14,29 @@ namespace Logic.DirectoryHelpers
 
         public IReadOnlyCollection<string> DirectoryNamesToIgnore { private get; set; }
 
-        public FilesReplicator(string sourceDirectory, string targetDirectory)
+        private readonly DirectoryHelper _directoryHelper;
+
+        public FilesReplicator(string sourceDirectory, string targetDirectory, DirectoryHelper directoryHelper = null)
         {
             _sourceDirectory = sourceDirectory;
             _targetDirectory = targetDirectory;
+            _directoryHelper = directoryHelper ?? new DirectoryHelper();
         }
 
         public async Task CopyAllAsync()
         {
             CheckSourceDirectoryForContent();
 
-            IReadOnlyCollection<FileCopyInfo> filesToCopy = GetAll();
-
-            var tasks = new List<Task>();
-            foreach (FileCopyInfo fileCopyInfo in filesToCopy)
-            {
-                tasks.Add(fileCopyInfo.CopyAsync());
-            }
-
             await Task.Run(() =>
             {
+                IReadOnlyCollection<FileCopyInfo> filesToCopy = GetAll();
+
+                var tasks = new List<Task>();
+                foreach (FileCopyInfo fileCopyInfo in filesToCopy)
+                {
+                    tasks.Add(fileCopyInfo.CopyAsync());
+                }
+
                 Task.WaitAll(tasks.ToArray());
             });
         }
@@ -66,7 +68,8 @@ namespace Logic.DirectoryHelpers
                 foreach (FileInfo file in directoryInfo.EnumerateFiles())
                     file.Delete();
 
-                IEnumerable<DirectoryInfo> dirsToRemove = GetSubDirectoriesWithoutIngored(directoryInfo);
+                IEnumerable<DirectoryInfo> dirsToRemove 
+                    = _directoryHelper.GetSubDirectoriesWithoutIngored(directoryInfo, DirectoryNamesToIgnore);
 
                 foreach (DirectoryInfo dir in dirsToRemove)
                     dir.Delete(true);
@@ -83,9 +86,7 @@ namespace Logic.DirectoryHelpers
 
         private void CheckSourceDirectoryForContent()
         {
-            var sourceDirInfo = new DirectoryInfo(_sourceDirectory);
-
-            if (!sourceDirInfo.EnumerateFiles().Any() || !GetSubDirectoriesWithoutIngored(sourceDirInfo).Any())
+            if (_directoryHelper.CheckSourceDirectoryForContent(_sourceDirectory, DirectoryNamesToIgnore))
                 throw new InvalidOperationException($@"В папке-источнике {_sourceDirectory} не обнаружено никаких файлов или папок");
         }
 
@@ -103,22 +104,14 @@ namespace Logic.DirectoryHelpers
             foreach (FileInfo fileInfo in fileInfos)
                 results.Add(new FileCopyInfo(fileInfo, targetDir));
 
-            IEnumerable<DirectoryInfo> directories = GetSubDirectoriesWithoutIngored(sourceDir);
+            IEnumerable<DirectoryInfo> directories 
+                = _directoryHelper.GetSubDirectoriesWithoutIngored(sourceDir, DirectoryNamesToIgnore);
 
             foreach (DirectoryInfo dir in directories)
             {
                 DirectoryInfo subDirectory = targetDir.CreateSubdirectory(dir.Name);
                 PerformDeepCopyScanning(dir.FullName, subDirectory.FullName, ref results);
             }
-        }
-
-        private IEnumerable<DirectoryInfo> GetSubDirectoriesWithoutIngored(DirectoryInfo sourceDir)
-        {
-            var directories = sourceDir.EnumerateDirectories();
-            if (DirectoryNamesToIgnore?.Count > 0)
-                directories = directories.Where(x => !DirectoryNamesToIgnore.Contains(x.Name));
-
-            return directories;
         }
     }
 }
