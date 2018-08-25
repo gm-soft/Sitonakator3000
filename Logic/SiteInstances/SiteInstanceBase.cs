@@ -42,12 +42,12 @@ namespace Logic.SiteInstances
         {
             var copyTargetDirectory = Path.Combine(WebsiteRootPath, GlobalInfo.SiteFolderName());
 
-            var filesProvider = new FilesToCopyProvider(DeployDirectoryPath, copyTargetDirectory)
+            var filesProvider = new FilesReplicator(DeployDirectoryPath, copyTargetDirectory)
             {
                 DirectoryNamesToIgnore = GlobalInfo.SpecificContentFolderNames()
             };
 
-            await filesProvider.CopyAllFilesAsync(copyFinishedCallback);
+            await filesProvider.CopyAllAsync(copyFinishedCallback);
         }
     }
 }

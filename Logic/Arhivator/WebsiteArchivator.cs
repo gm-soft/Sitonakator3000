@@ -66,16 +66,16 @@ namespace Logic.Arhivator
             if (Directory.Exists(archiveDirectoryPath))
                 throw new InvalidOperationException($@"Папка архива {archiveFolderName} уже сущестует. Не могу архивировать");
 
-            Directory.CreateDirectory(archiveDirectoryPath);
+            //Directory.CreateDirectory(archiveDirectoryPath);
 
-            var filesProvider = new FilesToCopyProvider(_siteDirectoryPath, archiveDirectoryPath)
+            var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath)
             {
                 DirectoryNamesToIgnore = _directoryNamesToIgnore
             };
 
-            await filesProvider.CopyAllFilesAsync();
+            await filesProvider.CopyAllAsync();
 
-            await RemoveAllContentAsync(_siteDirectoryPath);
+            await filesProvider.RemoveAllContentAsync(_siteDirectoryPath);
         }
 
         public static string GetNewFolderNameFromCurrentDate(string archiveFolderNamePostfix = null)
@@ -84,28 +84,6 @@ namespace Logic.Arhivator
             return !string.IsNullOrWhiteSpace(archiveFolderNamePostfix) 
                 ? currentDate + "-" + archiveFolderNamePostfix
                 : currentDate;
-        }
-
-        private async Task RemoveAllContentAsync(string directoryPath)
-        {
-            await Task.Run(() =>
-            {
-                var directoryInfo = new DirectoryInfo(directoryPath);
-
-                // https://stackoverflow.com/a/1288747
-                foreach (FileInfo file in directoryInfo.EnumerateFiles())
-                {
-                    file.Delete();
-                }
-
-                IEnumerable<DirectoryInfo> dirsToRemove = directoryInfo.EnumerateDirectories();
-
-                if (_directoryNamesToIgnore != null && _directoryNamesToIgnore.Count > 0)
-                    dirsToRemove = dirsToRemove.Where(x => !_directoryNamesToIgnore.Contains(x.Name.ToLowerInvariant()));
-
-                foreach (DirectoryInfo dir in dirsToRemove)
-                    dir.Delete(true);
-            });
         }
     }
 }

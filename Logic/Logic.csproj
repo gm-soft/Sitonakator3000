@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="Arhivator\AsyncActionResult.cs" />
     <Compile Include="DirectoryHelpers\FileCopyInfo.cs" />
-    <Compile Include="DirectoryHelpers\FilesToCopyProvider.cs" />
+    <Compile Include="DirectoryHelpers\FilesReplicator.cs" />
     <Compile Include="Arhivator\WebsiteArchivator.cs" />
     <Compile Include="IGlobalInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

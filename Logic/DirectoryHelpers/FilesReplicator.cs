@@ -7,7 +7,7 @@ using Logic.Arhivator;
 
 namespace Logic.DirectoryHelpers
 {
-    public class FilesToCopyProvider
+    public class FilesReplicator
     {
         private readonly string _sourceDirectory;
 
@@ -15,22 +15,16 @@ namespace Logic.DirectoryHelpers
 
         public IReadOnlyCollection<string> DirectoryNamesToIgnore { private get; set; }
 
-        public FilesToCopyProvider(string sourceDirectory, string targetDirectory)
+        public FilesReplicator(string sourceDirectory, string targetDirectory)
         {
             _sourceDirectory = sourceDirectory;
             _targetDirectory = targetDirectory;
         }
 
-        public IReadOnlyCollection<FileCopyInfo> GetAll()
+        public async Task CopyAllAsync()
         {
-            var result = new List<FileCopyInfo>();
-            PerformDeepCopyScanning(_sourceDirectory, _targetDirectory, ref result);
+            CheckSourceDirectoryForContent();
 
-            return result;
-        }
-
-        public async Task CopyAllFilesAsync()
-        {
             IReadOnlyCollection<FileCopyInfo> filesToCopy = GetAll();
 
             var tasks = new List<Task>();
@@ -45,14 +39,14 @@ namespace Logic.DirectoryHelpers
             });
         }
 
-        public async Task CopyAllFilesAsync(Action<AsyncActionResult> copyFinishedCallback)
+        public async Task CopyAllAsync(Action<AsyncActionResult> copyFinishedCallback)
         {
             if (copyFinishedCallback == null)
                 throw new ArgumentNullException(paramName: nameof(copyFinishedCallback));
 
             try
             {
-                await CopyAllFilesAsync();
+                await CopyAllAsync();
 
                 copyFinishedCallback(AsyncActionResult.Success());
             }
@@ -60,6 +54,39 @@ namespace Logic.DirectoryHelpers
             {
                 copyFinishedCallback(AsyncActionResult.Fail(ex));
             }
+        }
+
+        public async Task RemoveAllContentAsync(string directoryPath)
+        {
+            await Task.Run(() =>
+            {
+                var directoryInfo = new DirectoryInfo(directoryPath);
+
+                // https://stackoverflow.com/a/1288747
+                foreach (FileInfo file in directoryInfo.EnumerateFiles())
+                    file.Delete();
+
+                IEnumerable<DirectoryInfo> dirsToRemove = GetSubDirectoriesWithoutIngored(directoryInfo);
+
+                foreach (DirectoryInfo dir in dirsToRemove)
+                    dir.Delete(true);
+            });
+        }
+
+        private IReadOnlyCollection<FileCopyInfo> GetAll()
+        {
+            var result = new List<FileCopyInfo>();
+            PerformDeepCopyScanning(_sourceDirectory, _targetDirectory, ref result);
+
+            return result;
+        }
+
+        private void CheckSourceDirectoryForContent()
+        {
+            var sourceDirInfo = new DirectoryInfo(_sourceDirectory);
+
+            if (!sourceDirInfo.EnumerateFiles().Any() || !GetSubDirectoriesWithoutIngored(sourceDirInfo).Any())
+                throw new InvalidOperationException($@"В папке-источнике {_sourceDirectory} не обнаружено никаких файлов или папок");
         }
 
         // https://social.msdn.microsoft.com/Forums/vstudio/en-US/dab86e37-a25b-4bdb-9552-7e6c7ed509c7/how-to-copy-files-and-directories-recursively?forum=csharpgeneral
