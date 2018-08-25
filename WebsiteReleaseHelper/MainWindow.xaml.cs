@@ -17,8 +17,8 @@ using System.Windows.Shapes;
 using Logic;
 using Logic.Arhivator;
 using Logic.DirectoryHelpers;
+using Logic.SiteInstances;
 using WebsiteReleaseHelper.FormsControlWrappers;
-using WebsiteReleaseHelper.SiteInstances;
 using Path = System.IO.Path;
 using WebsiteArchivator = Logic.Arhivator.WebsiteArchivator;
 
@@ -29,8 +29,6 @@ namespace WebsiteReleaseHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly IGlobalInfo _globalInfo;
-
         private readonly PrimaryInstanceHelper _primaryInstanceHelper;
 
         private readonly ProgressBarWrapper _primaryInstanceProgressBar;
@@ -39,27 +37,9 @@ namespace WebsiteReleaseHelper
         {
             InitializeComponent();
 
-            _globalInfo = globalInfo;
-
             _primaryInstanceProgressBar = new ProgressBarWrapper(ProgressBar_PrimaryInstance, Dispatcher);
 
-            _primaryInstanceHelper = new PrimaryInstanceHelper(_globalInfo);
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            var sourceDirectory = _globalInfo.GetConfig("primary_instance_deploy_dir");
-            var targetDirectory = _globalInfo.GetConfig("primary_instance_target_dir");
-
-            targetDirectory = Path.Combine(targetDirectory, _globalInfo.SiteFolderName());
-
-            var filesProvider = new FilesToCopyProvider(sourceDirectory, targetDirectory)
-            {
-                DirecoryNamesToIgnore = _globalInfo.SpecificContentFolderNames()
-            };
-
-            var files = filesProvider.GetAll();
-            files = files;
+            _primaryInstanceHelper = new PrimaryInstanceHelper(globalInfo);
         }
 
         /// <summary>
@@ -71,28 +51,56 @@ namespace WebsiteReleaseHelper
             if (string.IsNullOrEmpty(archiveFolderPostfix))
                 archiveFolderPostfix = null;
 
+            StartPrimaryInstanceAsyncOperations("Начинаю архивировать первичную ноду");
+
             _primaryInstanceHelper.Archive(archiveFolderPostfix, archiveFinishedCallback: (archiveResult) =>
             {
                 UpdateInUiThread(() =>
                 {
-                    _primaryInstanceProgressBar.Stop();
-
                     var messageToShow = archiveResult.Result
                         ? "Архив сделан успешно"
                         : $"Произошла ошибка при архивировании: {archiveResult.Exception.Message}";
 
-                    Label_StatusBarInfo.Content = messageToShow;
+                    StopPrimaryInstanceAsyncOperations(messageToShow);
                 });
             });
-
-            _primaryInstanceProgressBar.Start();
-
-            Label_StatusBarInfo.Content = "Начинаю архивировать первичную ноду";
         }
 
         private void Button_CopyPrimaryNewFiles_OnClick(object sender, RoutedEventArgs e)
         {
-            _primaryInstanceHelper.CopyFilesFromDeployDirectory();
+            StartPrimaryInstanceAsyncOperations("Начинаю копирование файлов деплоя первичной ноды");
+
+            _primaryInstanceHelper.CopyFilesFromDeployDirectory((copyResult) =>
+            {
+                UpdateInUiThread(() =>
+                {
+                    var messageToShow = copyResult.Result
+                        ? "Копирование завершено"
+                        : $"Произошла ошибка при копировании: {copyResult.Exception.Message}";
+
+                    StopPrimaryInstanceAsyncOperations(messageToShow);
+                });
+            });
+        }
+
+        private void StartPrimaryInstanceAsyncOperations(string messageToShow)
+        {
+            _primaryInstanceProgressBar.Start();
+
+            Label_StatusBarInfo.Content = messageToShow;
+
+            Button_ArhivePrimaryInstance.IsEnabled = false;
+            Button_CopyPrimaryNewFiles.IsEnabled = false;
+        }
+
+        private void StopPrimaryInstanceAsyncOperations(string messageToShow)
+        {
+            _primaryInstanceProgressBar.Stop();
+
+            Label_StatusBarInfo.Content = messageToShow;
+
+            Button_ArhivePrimaryInstance.IsEnabled = true;
+            Button_CopyPrimaryNewFiles.IsEnabled = true;
         }
 
         private void Button_OpenPrimaryInstancePage_OnClick(object sender, RoutedEventArgs e)

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Logic.Arhivator;
 
 namespace Logic.DirectoryHelpers
 {
@@ -10,7 +13,7 @@ namespace Logic.DirectoryHelpers
 
         private readonly string _targetDirectory;
 
-        public IReadOnlyCollection<string> DirecoryNamesToIgnore { private get; set; }
+        public IReadOnlyCollection<string> DirectoryNamesToIgnore { private get; set; }
 
         public FilesToCopyProvider(string sourceDirectory, string targetDirectory)
         {
@@ -24,6 +27,39 @@ namespace Logic.DirectoryHelpers
             PerformDeepCopyScanning(_sourceDirectory, _targetDirectory, ref result);
 
             return result;
+        }
+
+        public async Task CopyAllFilesAsync()
+        {
+            IReadOnlyCollection<FileCopyInfo> filesToCopy = GetAll();
+
+            var tasks = new List<Task>();
+            foreach (FileCopyInfo fileCopyInfo in filesToCopy)
+            {
+                tasks.Add(fileCopyInfo.CopyAsync());
+            }
+
+            await Task.Run(() =>
+            {
+                Task.WaitAll(tasks.ToArray());
+            });
+        }
+
+        public async Task CopyAllFilesAsync(Action<AsyncActionResult> copyFinishedCallback)
+        {
+            if (copyFinishedCallback == null)
+                throw new ArgumentNullException(paramName: nameof(copyFinishedCallback));
+
+            try
+            {
+                await CopyAllFilesAsync();
+
+                copyFinishedCallback(AsyncActionResult.Success());
+            }
+            catch (Exception ex)
+            {
+                copyFinishedCallback(AsyncActionResult.Fail(ex));
+            }
         }
 
         // https://social.msdn.microsoft.com/Forums/vstudio/en-US/dab86e37-a25b-4bdb-9552-7e6c7ed509c7/how-to-copy-files-and-directories-recursively?forum=csharpgeneral
@@ -52,8 +88,8 @@ namespace Logic.DirectoryHelpers
         private IEnumerable<DirectoryInfo> GetSubDirectoriesWithoutIngored(DirectoryInfo sourceDir)
         {
             var directories = sourceDir.EnumerateDirectories();
-            if (DirecoryNamesToIgnore?.Count > 0)
-                directories = directories.Where(x => !DirecoryNamesToIgnore.Contains(x.Name));
+            if (DirectoryNamesToIgnore?.Count > 0)
+                directories = directories.Where(x => !DirectoryNamesToIgnore.Contains(x.Name));
 
             return directories;
         }

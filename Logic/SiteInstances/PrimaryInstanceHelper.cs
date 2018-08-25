@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Logic;
 
-namespace WebsiteReleaseHelper.SiteInstances
+namespace Logic.SiteInstances
 {
     public class PrimaryInstanceHelper : SiteInstanceBase
     {

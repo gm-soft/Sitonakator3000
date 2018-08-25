@@ -12,7 +12,7 @@ namespace Logic.Arhivator
         private readonly string _siteDirectoryPath;
         private readonly string _archDirectoryRootPath;
 
-        private readonly IReadOnlyCollection<string> _direcoryNamesToIgnore;
+        private readonly IReadOnlyCollection<string> _directoryNamesToIgnore;
 
         public WebsiteArchivator(string websiteRootPath, IGlobalInfo globalInfo)
         {
@@ -21,7 +21,7 @@ namespace Logic.Arhivator
 
             var websiteDirectoryRootPath = websiteRootPath;
 
-            _direcoryNamesToIgnore = globalInfo.SpecificContentFolderNames();
+            _directoryNamesToIgnore = globalInfo.SpecificContentFolderNames();
 
             _siteDirectoryPath = Path.Combine(websiteDirectoryRootPath, globalInfo.SiteFolderName());
             _archDirectoryRootPath = Path.Combine(websiteDirectoryRootPath, globalInfo.SiteArchiveFolderName());
@@ -33,11 +33,14 @@ namespace Logic.Arhivator
                 Directory.CreateDirectory(_archDirectoryRootPath);
         }
 
-        public void Archive(string archiveFolderNamePostfix, Action<ArchiveResult> archiveFinishedCallback)
+        public void Archive(string archiveFolderNamePostfix, Action<AsyncActionResult> archiveFinishedCallback)
         {
             if (archiveFolderNamePostfix != null &&
                 string.Equals(archiveFolderNamePostfix.Trim(), string.Empty, StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException(@"Не нужно передавать пустую строку в качестве имени постфикса");
+
+            if (archiveFinishedCallback == null)
+                throw new ArgumentNullException(paramName: nameof(archiveFinishedCallback));
 
             Task.Run(async () =>
             {
@@ -45,11 +48,11 @@ namespace Logic.Arhivator
                 {
                     await ArchiveAsync(archiveFolderNamePostfix);
                     
-                    archiveFinishedCallback(ArchiveResult.Success());
+                    archiveFinishedCallback(AsyncActionResult.Success());
                 }
                 catch (Exception exception)
                 {
-                    archiveFinishedCallback(ArchiveResult.Fail(exception));
+                    archiveFinishedCallback(AsyncActionResult.Fail(exception));
                 }
             });
         }
@@ -67,18 +70,10 @@ namespace Logic.Arhivator
 
             var filesProvider = new FilesToCopyProvider(_siteDirectoryPath, archiveDirectoryPath)
             {
-                DirecoryNamesToIgnore = _direcoryNamesToIgnore
+                DirectoryNamesToIgnore = _directoryNamesToIgnore
             };
 
-            IReadOnlyCollection<FileCopyInfo> filesToCopy = filesProvider.GetAll();
-
-            var tasks = new List<Task>();
-            foreach (FileCopyInfo fileCopyInfo in filesToCopy)
-            {
-                tasks.Add(fileCopyInfo.CopyAsync());
-            }
-
-            Task.WaitAll(tasks.ToArray());
+            await filesProvider.CopyAllFilesAsync();
 
             await RemoveAllContentAsync(_siteDirectoryPath);
         }
@@ -91,11 +86,11 @@ namespace Logic.Arhivator
                 : currentDate;
         }
 
-        private async Task<bool> RemoveAllContentAsync(string directorypPath)
+        private async Task RemoveAllContentAsync(string directoryPath)
         {
-            return await Task.Run(() =>
+            await Task.Run(() =>
             {
-                var directoryInfo = new DirectoryInfo(directorypPath);
+                var directoryInfo = new DirectoryInfo(directoryPath);
 
                 // https://stackoverflow.com/a/1288747
                 foreach (FileInfo file in directoryInfo.EnumerateFiles())
@@ -105,13 +100,11 @@ namespace Logic.Arhivator
 
                 IEnumerable<DirectoryInfo> dirsToRemove = directoryInfo.EnumerateDirectories();
 
-                if (_direcoryNamesToIgnore != null && _direcoryNamesToIgnore.Count > 0)
-                    dirsToRemove = dirsToRemove.Where(x => !_direcoryNamesToIgnore.Contains(x.Name.ToLowerInvariant()));
+                if (_directoryNamesToIgnore != null && _directoryNamesToIgnore.Count > 0)
+                    dirsToRemove = dirsToRemove.Where(x => !_directoryNamesToIgnore.Contains(x.Name.ToLowerInvariant()));
 
                 foreach (DirectoryInfo dir in dirsToRemove)
                     dir.Delete(true);
-
-                return true;
             });
         }
     }

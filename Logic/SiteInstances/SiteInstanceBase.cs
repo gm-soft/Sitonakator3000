@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Threading;
-using Logic;
+using System.IO;
 using Logic.Arhivator;
+using Logic.DirectoryHelpers;
 
-namespace WebsiteReleaseHelper.SiteInstances
+namespace Logic.SiteInstances
 {
     public abstract class SiteInstanceBase
     {
@@ -31,16 +31,23 @@ namespace WebsiteReleaseHelper.SiteInstances
                 Process.Start(websiteUrl);
         }
 
-        public void Archive(string archiveFolderNamePostfix, Action<ArchiveResult> archiveFinishedCallback)
+        public void Archive(string archiveFolderNamePostfix, Action<AsyncActionResult> archiveFinishedCallback)
         {
             var websiteDir = new WebsiteArchivator(WebsiteRootPath, GlobalInfo);
 
             websiteDir.Archive(archiveFolderNamePostfix, archiveFinishedCallback);
         }
 
-        public void CopyFilesFromDeployDirectory()
+        public async void CopyFilesFromDeployDirectory(Action<AsyncActionResult> copyFinishedCallback)
         {
+            var copyTargetDirectory = Path.Combine(WebsiteRootPath, GlobalInfo.SiteFolderName());
 
+            var filesProvider = new FilesToCopyProvider(DeployDirectoryPath, copyTargetDirectory)
+            {
+                DirectoryNamesToIgnore = GlobalInfo.SpecificContentFolderNames()
+            };
+
+            await filesProvider.CopyAllFilesAsync(copyFinishedCallback);
         }
     }
 }
