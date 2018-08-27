@@ -1,36 +1,62 @@
 ﻿[
   {
-    // Имя, которое будет использоваться в программе для отображения
-    "DisplayableName": "Primary Instance",
-
-    // Папка, куда деплоятся новые файлы проекта
-    "DeployDirectoryPath": "\\\\kaspihelpt-1\\exch\\web",
-
-    // Папка сайта, в которой содержатся подпапки с файлами проекта и архивами
-    "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\KaspiHelpTest",
-
-    // Урлы сайта, чтоб запустить в браузере
+    "DisplayableName": "Первичная нода (модераторская)",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB",
+    "WebsiteRootPath": "\\\\kaspihelp-1\\c$\\Projects\\KaspiHelp-82",
+    "WebsiteUrls": [ "http://kaspihelp-1:82/guide" ]
+  },
+  // Ноды Каспи гид
+  {
+    "DisplayableName": "kaspihelp-1",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_Secondary",
+    "WebsiteRootPath": "\\\\kaspihelp-1\\c$\\Projects\\KaspiHelp",
+    "WebsiteUrls": [ "http://kaspihelp-1/guide", "http://kaspihelp-1:81/guide" ]
+  },
+  {
+    "DisplayableName": "kaspihelp-2",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_Secondary",
+    "WebsiteRootPath": "\\\\kaspihelp-2\\c$\\Projects\\KaspiHelp",
+    "WebsiteUrls": [ "http://kaspihelp-2/guide", "http://kaspihelp-2:81/guide" ]
+  },
+  {
+    "DisplayableName": "kaspihelp-3",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_Secondary",
+    "WebsiteRootPath": "\\\\kaspihelp-3\\c$\\Projects\\KaspiHelp",
+    "WebsiteUrls": [ "http://kaspihelp-3/guide" ]
+  },
+  {
+    "DisplayableName": "kaspihelp-4",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_Secondary",
+    "WebsiteRootPath": "\\\\kaspihelp-4\\c$\\Projects\\KaspiHelp",
+    "WebsiteUrls": [ "http://kaspihelp-4/guide" ]
+  },
+  {
+    "DisplayableName": "kaspihelp-5",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_Secondary",
+    "WebsiteRootPath": "\\\\kaspihelp-5\\c$\\Projects\\KaspiHelp",
+    "WebsiteUrls": [ "http://kaspihelp-5/guide" ]
+  },
+  {
+    "DisplayableName": "kaspihelp-6",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_Secondary",
+    "WebsiteRootPath": "\\\\kaspihelp-6\\c$\\Projects\\KaspiHelp",
+    "WebsiteUrls": [ "http://kaspihelp-6/guide" ]
+  },
+  // Ноды Каспи Менеджер
+  {
+    "DisplayableName": "Kaspi менеджер (kaspihelp-1)",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_KaspiManager",
+    "WebsiteRootPath": "\\\\kaspihelp-1\\c$\\Projects\\KaspiHelpManagerPortal",
     "WebsiteUrls": [
-      "http://kaspihelpt-1/guide"
+      "http://kaspihelp-1:91/guide"
     ]
   },
-
   {
-    "DisplayableName": "kaspihelpt-1-81",
-    "DeployDirectoryPath": "\\\\kaspihelpt-1\\exch\\web",
-    "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\kaspihelpt-1-81",
+    "DisplayableName": "Kaspi менеджер (kaspihelp-2)",
+    "DeployDirectoryPath": "\\\\kaspihelp-1\\exch\\WEB_KaspiManager",
+    "WebsiteRootPath": "\\\\kaspihelp-2\\c$\\Projects\\KaspiHelpManagerPortal",
     "WebsiteUrls": [
-      "http://kaspihelpt-1:81/guide"
-    ]
-  },
-
-  {
-    "DisplayableName": "kaspihelpt-1-83",
-    "DeployDirectoryPath": "\\\\kaspihelpt-1\\exch\\web",
-    "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\kaspihelpt-1-83",
-    "WebsiteUrls": [
-      "http://kaspihelpt-1:83/guide",
-      "http://kaspihelpt-1:84/guide"
+      "http://kaspihelp-2:91/guide"
     ]
   }
 ]
