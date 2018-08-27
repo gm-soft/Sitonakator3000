@@ -51,6 +51,9 @@ namespace Logic.IoProviders
 
             try
             {
+                // Сначала удалим все файлы в паке, куда копируем
+                await _directoryHelper.RemoveAllContentAsync(_targetDirectory);
+
                 await CopyAllAsync();
 
                 copyFinishedCallback(AsyncActionResult.Success());

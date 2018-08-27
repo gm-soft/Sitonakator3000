@@ -68,8 +68,6 @@ namespace Logic.Arhivator
             var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath, _directoryHelper);
 
             await filesProvider.CopyAllAsync();
-
-            await _directoryHelper.RemoveAllContentAsync(_siteDirectoryPath);
         }
 
         public static string GetNewFolderNameFromCurrentDate(string archiveFolderNamePostfix = null)

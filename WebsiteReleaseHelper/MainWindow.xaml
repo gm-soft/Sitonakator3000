@@ -29,9 +29,9 @@
                 <TextBox Height="26" Margin="10,116,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" x:Name="TextBox_ArchiveFolderPostfix"/>
             </Grid>
         </GroupBox>
-        <StatusBar Grid.Row="3" Grid.ColumnSpan="2"/>
-        <Label Content="" Name="Label_StatusBarInfo" Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0"/>
-        <ProgressBar x:Name="ProgressBar_Common" Margin="613,10,-240,10" Grid.Row="3" Grid.Column="1"/>
+        <StatusBar Grid.Row="3" Grid.ColumnSpan="2">
+            <Label Content="" x:Name="Label_StatusBarInfo" Height="31" Width="588"/>
+        </StatusBar>
         <ListBox Margin="10,41,10,10" x:Name="ListBox_WebsiteNodes" SelectionChanged="ListBox_WebsiteNodes_OnSelectionChanged" Grid.RowSpan="2"/>
         <GroupBox Grid.Column="1" Header="Информация о ноде" Margin="10" Grid.Row="1">
             <Grid Margin="10,10,9,10">
@@ -52,6 +52,16 @@
             </Grid>
         </GroupBox>
         <Label Content="Список нод" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
+        <ProgressBar x:Name="ProgressBar_Common" RenderTransformOrigin="0.5,0.5" Margin="11,9,8,6" Grid.Row="2" Grid.ColumnSpan="2">
+            <ProgressBar.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ProgressBar.RenderTransform>
+        </ProgressBar>
 
     </Grid>
 </Window>

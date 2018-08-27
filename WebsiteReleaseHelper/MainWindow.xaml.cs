@@ -65,15 +65,15 @@ namespace WebsiteReleaseHelper
             if (string.IsNullOrEmpty(archiveFolderPostfix))
                 archiveFolderPostfix = null;
 
-            StartPrimaryInstanceAsyncOperations("Начат процесс архивации {}");
+            StartPrimaryInstanceAsyncOperations("Начинаю процесс архивации");
 
             _currentSiteInstance.Archive(archiveFolderPostfix, archiveFinishedCallback: (archiveResult) =>
             {
                 UpdateInUiThread(() =>
                 {
                     var messageToShow = archiveResult.Result
-                        ? "Архив сделан успешно"
-                        : $"Произошла ошибка при архивировании: {archiveResult.Exception.Message}";
+                        ? $"Архив сделан успешно"
+                        : $"Ошибка при архивировании: {archiveResult.Exception.Message}";
 
                     StopPrimaryInstanceAsyncOperations(messageToShow);
                 });
@@ -84,7 +84,7 @@ namespace WebsiteReleaseHelper
         {
             ThrowErrorIfNoSelectedInstance();
 
-            StartPrimaryInstanceAsyncOperations("Начинаю копирование файлов деплоя первичной ноды");
+            StartPrimaryInstanceAsyncOperations("Начинаю копирование файлов деплоя");
 
             _currentSiteInstance.CopyFilesFromDeployDirectory((copyResult) =>
             {
@@ -107,6 +107,7 @@ namespace WebsiteReleaseHelper
 
             Button_ArhivePrimaryInstance.IsEnabled = false;
             Button_CopyPrimaryNewFiles.IsEnabled = false;
+            ListBox_WebsiteNodes.IsEnabled = false;
         }
 
         private void StopPrimaryInstanceAsyncOperations(string messageToShow)
@@ -117,6 +118,7 @@ namespace WebsiteReleaseHelper
 
             Button_ArhivePrimaryInstance.IsEnabled = true;
             Button_CopyPrimaryNewFiles.IsEnabled = true;
+            ListBox_WebsiteNodes.IsEnabled = true;
         }
 
         private void Button_OpenPrimaryInstancePage_OnClick(object sender, RoutedEventArgs e)
