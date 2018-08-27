@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WebsiteReleaseHelper"
         mc:Ignorable="d"
-        Title="Сайтонакатор 3000" Height="632.407" Width="608" WindowStartupLocation="CenterScreen">
+        Title="Сайтонакатор 3000" MinHeight="633" Height="633" MinWidth="608" Width="608" WindowStartupLocation="CenterScreen">
     <Grid Margin="0,0,2,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="225*"/>
