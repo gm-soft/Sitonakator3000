@@ -37,6 +37,9 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Logoicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -112,6 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Logoicon.ico" />
     <Content Include="WebsiteNodesInfo.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
