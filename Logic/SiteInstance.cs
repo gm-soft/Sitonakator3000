@@ -14,10 +14,11 @@ namespace Logic
         {
             _globalInfo = globalInfo;
 
-            _displayableName = nodeData.DisplayableName;
+            DisplayableName = nodeData.DisplayableName;
+            DeployDirectoryPath = nodeData.DeployDirectoryPath;
+            WebsiteRootPath = nodeData.WebsiteRootPath;
+
             _websiteUrls = nodeData.WebsiteUrls;
-            _deployDirectoryPath = nodeData.DeployDirectoryPath;
-            _websiteRootPath = nodeData.WebsiteRootPath;
 
             DirectoryHelper = new DirectoryHelper(_globalInfo.SpecificContentFolderNames());
         }
@@ -27,22 +28,24 @@ namespace Logic
         /// <summary>
         /// Отображаемое в программе имя
         /// </summary>
-        private readonly string _displayableName;
+        public string DisplayableName { get; }
 
         /// <summary>
         /// Путь до папки сайта, который содержит подпапки с файлами проекта, архивами и логами
         /// </summary>
-        private readonly string _websiteRootPath;
+        public string WebsiteRootPath { get; }
 
         /// <summary>
         /// Путь до папки, куда деплоятся файлы с машин разработчиков
         /// </summary>
-        private readonly string _deployDirectoryPath;
+        public string DeployDirectoryPath { get; }
 
         /// <summary>
         /// Урлы сайта, которые нужно открыть в браузере, чтобы запустить ноды
         /// </summary>
         private readonly IReadOnlyCollection<string> _websiteUrls;
+
+        public string WebsiteUrlsAsString => string.Join(", ", _websiteUrls);
 
         protected DirectoryHelper DirectoryHelper { get; }
 
@@ -57,23 +60,33 @@ namespace Logic
 
         public void Archive(string archiveFolderNamePostfix, Action<AsyncActionResult> archiveFinishedCallback)
         {
-            var websiteDir = new WebsiteArchivator(_websiteRootPath, _globalInfo, DirectoryHelper);
+            var websiteDir = new WebsiteArchivator(WebsiteRootPath, _globalInfo, DirectoryHelper);
 
             websiteDir.Archive(archiveFolderNamePostfix, archiveFinishedCallback);
         }
 
         public async void CopyFilesFromDeployDirectory(Action<AsyncActionResult> copyFinishedCallback)
         {
-            var copyTargetDirectory = Path.Combine(_websiteRootPath, _globalInfo.SiteFolderName());
+            var copyTargetDirectory = Path.Combine(WebsiteRootPath, _globalInfo.SiteFolderName());
 
-            var filesProvider = new FilesReplicator(_deployDirectoryPath, copyTargetDirectory, DirectoryHelper);
+            var filesProvider = new FilesReplicator(DeployDirectoryPath, copyTargetDirectory, DirectoryHelper);
 
             await filesProvider.CopyAllAsync(copyFinishedCallback);
         }
 
+        public void OpenDeployDirectory()
+        {
+            Process.Start(DeployDirectoryPath);
+        }
+
+        public void OpenWebsiteRootDirectory()
+        {
+            Process.Start(WebsiteRootPath);
+        }
+
         public override string ToString()
         {
-            return _displayableName;
+            return DisplayableName;
         }
     }
 }

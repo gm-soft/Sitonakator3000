@@ -46,6 +46,14 @@ namespace WebsiteReleaseHelper
                 ListBox_WebsiteNodes.Items.Add(node);
         }
 
+        private void FillInfoForCurrentWebsite()
+        {
+            TextBlock_DisplayableName.Text = _currentSiteInstance.DisplayableName;
+            TextBlock_DeployDirectoryPath.Text = _currentSiteInstance.DeployDirectoryPath;
+            TextBlock_WebsiteRootPath.Text = _currentSiteInstance.WebsiteRootPath;
+            TextBlock_WebsiteUrls.Text = _currentSiteInstance.WebsiteUrlsAsString;
+        }
+
         /// <summary>
         /// Архивирование первичной ноды
         /// </summary>
@@ -136,6 +144,22 @@ namespace WebsiteReleaseHelper
         private void ListBox_WebsiteNodes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _currentSiteInstance = (SiteInstance)ListBox_WebsiteNodes.SelectedItem;
+
+            FillInfoForCurrentWebsite();
+        }
+
+        private void Button_OpenDeployDirectory_OnClick(object sender, RoutedEventArgs e)
+        {
+            ThrowErrorIfNoSelectedInstance();
+
+            _currentSiteInstance.OpenDeployDirectory();
+        }
+
+        private void Button_OpenWebsiteDirectory_OnClick(object sender, RoutedEventArgs e)
+        {
+            ThrowErrorIfNoSelectedInstance();
+
+            _currentSiteInstance.OpenWebsiteRootDirectory();
         }
     }
 }
