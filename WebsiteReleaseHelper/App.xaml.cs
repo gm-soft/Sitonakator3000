@@ -22,24 +22,47 @@ namespace WebsiteReleaseHelper
         /// </summary>
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            SetCallbacks();
-
             _globalInfo = new WebsiteReleaseGlobalInfo();
 
-            // Create the startup window
-            var wnd = new MainWindow(_globalInfo, GetWebsiteNodes());
-            wnd.Show();
+            IReadOnlyCollection<SiteInstance> nodes = TryGetWebsiteNodes();
+
+            if (nodes != null)
+            {
+                SetCallbacks();
+
+                // Create the startup window
+                var wnd = new MainWindow(_globalInfo, nodes);
+                wnd.Show();
+            }
+            else
+            {
+                Shutdown();
+            }
         }
 
-        private IReadOnlyCollection<SiteInstance> GetWebsiteNodes()
+        private IReadOnlyCollection<SiteInstance> TryGetWebsiteNodes()
         {
-            // Ожидаем файл в той же директории, где и иполняемый файл программы.
-            // В настройках сборки прописано, что должен копироваться в ту же директорию
-            var filecontent = File.ReadAllText("WebsiteNodesInfo.json");
+            IReadOnlyCollection<SiteInstance> result = null;
+            try
+            {
+                // Ожидаем файл в той же директории, где и иполняемый файл программы.
+                // В настройках сборки прописано, что должен копироваться в ту же директорию
+                var filecontent = File.ReadAllText("WebsiteNodesInfo.json");
 
-            var nodes = new SettingsParser(filecontent, _globalInfo).GetSettings();
+                var nodes = new SettingsParser(filecontent, _globalInfo).GetSettings();
 
-            return nodes.Select(x => new SiteInstance(x, _globalInfo)).ToArray();
+                result = nodes.Select(x => new SiteInstance(x, _globalInfo)).ToArray();
+            }
+            catch (Exception ex)
+            {
+                var message = $"Произошла ошибка при чтении файла настроек.\r\n{ex.Message}";
+                if (ex.InnerException != null)
+                    message += "\r\n" + ex.InnerException.Message;
+
+                HandleException(message);
+            }
+
+            return result;
         }
 
         #region Обработчики ошибок
@@ -65,7 +88,12 @@ namespace WebsiteReleaseHelper
 
         private static void HandleException(Exception exception)
         {
-            MessageBox.Show(exception.Message, caption: "Ошибка в программе");
+            HandleException(exception.Message);
+        }
+
+        private static void HandleException(string errorMessage)
+        {
+            MessageBox.Show(errorMessage, caption: "Ошибка в программе");
         }
 
         #endregion
