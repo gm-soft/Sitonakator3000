@@ -1,3 +1,17 @@
-﻿{
-	"foo":  "bar"
-}
+﻿[
+  {
+    // Имя, которое будет использоваться в программе для отображения
+    "DisplayableName": "Primary Instance",
+
+    // Папка, куда деплоятся новые файлы проекта
+    "DeployDirectoryPath": "\\\\kaspihelpt-1\\exch\\web",
+
+    // Папка сайта, в которой содержатся подпапки с файлами проекта и архивами
+    "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\KaspiHelpTest",
+
+    // Урлы сайта, чтоб запустить в браузере
+    "WebsiteUrls": [
+      "http://kaspihelpt-1/guide"
+    ]
+  }
+]

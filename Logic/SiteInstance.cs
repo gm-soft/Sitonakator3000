@@ -4,60 +4,76 @@ using System.Diagnostics;
 using System.IO;
 using Logic.Arhivator;
 using Logic.IoProviders;
+using Logic.Settings;
 
-namespace Logic.SiteInstances
+namespace Logic
 {
-    public abstract class SiteInstanceBase
+    public class SiteInstance
     {
-        protected SiteInstanceBase(IGlobalInfo globalInfo)
+        public SiteInstance(WebsiteNodeData nodeData, IGlobalInfo globalInfo)
         {
-            GlobalInfo = globalInfo;
+            _globalInfo = globalInfo;
 
-            DirectoryHelper = new DirectoryHelper(GlobalInfo.SpecificContentFolderNames());
+            _displayableName = nodeData.DisplayableName;
+            _websiteUrls = nodeData.WebsiteUrls;
+            _deployDirectoryPath = nodeData.DeployDirectoryPath;
+            _websiteRootPath = nodeData.WebsiteRootPath;
+
+            DirectoryHelper = new DirectoryHelper(_globalInfo.SpecificContentFolderNames());
         }
 
-        protected IGlobalInfo GlobalInfo { get; }
+        private readonly IGlobalInfo _globalInfo;
+
+        /// <summary>
+        /// Отображаемое в программе имя
+        /// </summary>
+        private readonly string _displayableName;
 
         /// <summary>
         /// Путь до папки сайта, который содержит подпапки с файлами проекта, архивами и логами
         /// </summary>
-        protected abstract string WebsiteRootPath { get; }
-        
+        private readonly string _websiteRootPath;
+
         /// <summary>
         /// Путь до папки, куда деплоятся файлы с машин разработчиков
         /// </summary>
-        protected abstract string DeployDirectoryPath { get; }
+        private readonly string _deployDirectoryPath;
 
         /// <summary>
         /// Урлы сайта, которые нужно открыть в браузере, чтобы запустить ноды
         /// </summary>
-        protected abstract IReadOnlyCollection<string> WebsiteUrls { get; }
+        private readonly IReadOnlyCollection<string> _websiteUrls;
 
         protected DirectoryHelper DirectoryHelper { get; }
 
         public void OpenInWebBrowser()
         {
-            if (WebsiteUrls == null || WebsiteUrls.Count == 0)
+            if (_websiteUrls == null || _websiteUrls.Count == 0)
                 throw new InvalidOperationException(@"Не указаны веб-урлы для запуска сайта");
 
-            foreach (string websiteUrl in WebsiteUrls)
+            foreach (string websiteUrl in _websiteUrls)
                 Process.Start(websiteUrl);
         }
 
         public void Archive(string archiveFolderNamePostfix, Action<AsyncActionResult> archiveFinishedCallback)
         {
-            var websiteDir = new WebsiteArchivator(WebsiteRootPath, GlobalInfo, DirectoryHelper);
+            var websiteDir = new WebsiteArchivator(_websiteRootPath, _globalInfo, DirectoryHelper);
 
             websiteDir.Archive(archiveFolderNamePostfix, archiveFinishedCallback);
         }
 
         public async void CopyFilesFromDeployDirectory(Action<AsyncActionResult> copyFinishedCallback)
         {
-            var copyTargetDirectory = Path.Combine(WebsiteRootPath, GlobalInfo.SiteFolderName());
+            var copyTargetDirectory = Path.Combine(_websiteRootPath, _globalInfo.SiteFolderName());
 
-            var filesProvider = new FilesReplicator(DeployDirectoryPath, copyTargetDirectory, DirectoryHelper);
+            var filesProvider = new FilesReplicator(_deployDirectoryPath, copyTargetDirectory, DirectoryHelper);
 
             await filesProvider.CopyAllAsync(copyFinishedCallback);
+        }
+
+        public override string ToString()
+        {
+            return _displayableName;
         }
     }
 }

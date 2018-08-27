@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,8 +51,14 @@
     <Compile Include="Arhivator\WebsiteArchivator.cs" />
     <Compile Include="IGlobalInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SiteInstances\PrimaryInstanceHelper.cs" />
-    <Compile Include="SiteInstances\SiteInstanceBase.cs" />
+    <Compile Include="Settings\SettingsParser.cs" />
+    <Compile Include="Settings\SettingsParserException.cs" />
+    <Compile Include="Settings\WebsiteNodeData.cs" />
+    <Compile Include="SiteInstance.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

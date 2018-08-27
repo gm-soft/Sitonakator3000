@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Logic;
-using Logic.SiteInstances;
+using Logic.Settings;
 using WebsiteReleaseHelper.FormsControlWrappers;
 
 namespace WebsiteReleaseHelper
@@ -19,17 +21,29 @@ namespace WebsiteReleaseHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly PrimaryInstanceHelper _primaryInstanceHelper;
+        private readonly IGlobalInfo _globalInfo;
+
+        private SiteInstance _currentSiteInstance;
 
         private readonly ProgressBarWrapper _primaryInstanceProgressBar;
 
-        public MainWindow(IGlobalInfo globalInfo)
+        public MainWindow(IGlobalInfo globalInfo, IReadOnlyCollection<SiteInstance> websiteInstances)
         {
             InitializeComponent();
 
+            _globalInfo = globalInfo;
+
             _primaryInstanceProgressBar = new ProgressBarWrapper(ProgressBar_Common, Dispatcher);
 
-            _primaryInstanceHelper = new PrimaryInstanceHelper(globalInfo);
+            FillListbox(websiteInstances);
+        }
+
+        private void FillListbox(IReadOnlyCollection<SiteInstance> websiteInstances)
+        {
+            ListBox_WebsiteNodes.Items.Clear();
+
+            foreach (SiteInstance node in websiteInstances)
+                ListBox_WebsiteNodes.Items.Add(node);
         }
 
         /// <summary>
@@ -37,13 +51,15 @@ namespace WebsiteReleaseHelper
         /// </summary>
         private void Button_ArhivePrimaryInstance_OnClick(object sender, RoutedEventArgs e)
         {
+            ThrowErrorIfNoSelectedInstance();
+
             var archiveFolderPostfix = TextBox_ArchiveFolderPostfix.Text.Trim().ToLowerInvariant();
             if (string.IsNullOrEmpty(archiveFolderPostfix))
                 archiveFolderPostfix = null;
 
-            StartPrimaryInstanceAsyncOperations("Начинаю архивировать первичную ноду");
+            StartPrimaryInstanceAsyncOperations("Начат процесс архивации {}");
 
-            _primaryInstanceHelper.Archive(archiveFolderPostfix, archiveFinishedCallback: (archiveResult) =>
+            _currentSiteInstance.Archive(archiveFolderPostfix, archiveFinishedCallback: (archiveResult) =>
             {
                 UpdateInUiThread(() =>
                 {
@@ -58,9 +74,11 @@ namespace WebsiteReleaseHelper
 
         private void Button_CopyPrimaryNewFiles_OnClick(object sender, RoutedEventArgs e)
         {
+            ThrowErrorIfNoSelectedInstance();
+
             StartPrimaryInstanceAsyncOperations("Начинаю копирование файлов деплоя первичной ноды");
 
-            _primaryInstanceHelper.CopyFilesFromDeployDirectory((copyResult) =>
+            _currentSiteInstance.CopyFilesFromDeployDirectory((copyResult) =>
             {
                 UpdateInUiThread(() =>
                 {
@@ -95,7 +113,9 @@ namespace WebsiteReleaseHelper
 
         private void Button_OpenPrimaryInstancePage_OnClick(object sender, RoutedEventArgs e)
         {
-            _primaryInstanceHelper.OpenInWebBrowser();
+            ThrowErrorIfNoSelectedInstance();
+
+            _currentSiteInstance.OpenInWebBrowser();
         }
 
         /// <summary>
@@ -107,9 +127,15 @@ namespace WebsiteReleaseHelper
             Dispatcher.Invoke(action);
         }
 
-        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ThrowErrorIfNoSelectedInstance()
         {
+            if (_currentSiteInstance == null)
+                throw new InvalidOperationException(@"Нужно выбрать ноду в списке");
+        }
 
+        private void ListBox_WebsiteNodes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _currentSiteInstance = (SiteInstance)ListBox_WebsiteNodes.SelectedItem;
         }
     }
 }
