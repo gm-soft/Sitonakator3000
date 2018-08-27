@@ -72,7 +72,8 @@ namespace Logic.Settings
 
         private void CheckUniqueness<TResult>(Func<WebsiteNodeData, TResult> selector, string errorMessage)
         {
-            if(_parsedResult.Select(selector).Distinct().Count() > 1)
+            IEnumerable<TResult> selection = _parsedResult.Select(selector);
+            if (selection.Distinct().Count() != selection.Count())
                 throw new ArgumentException(errorMessage);
         }
 
