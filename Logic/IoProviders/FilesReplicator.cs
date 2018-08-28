@@ -26,7 +26,12 @@ namespace Logic.IoProviders
                                ?? throw new ArgumentNullException(paramName: nameof(directoryHelper));
         }
 
-        public async Task CopyAllAsync()
+        /// <summary>
+        /// Копирование без обработки исключений
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <returns></returns>
+        internal async Task CopyAllAsync()
         {
             CheckSourceDirectoryForContent();
 
@@ -36,23 +41,26 @@ namespace Logic.IoProviders
 
                 var tasks = new List<Task>();
                 foreach (FileCopyInfo fileCopyInfo in filesToCopy)
-                {
                     tasks.Add(fileCopyInfo.CopyAsync());
-                }
 
                 Task.WaitAll(tasks.ToArray());
             });
         }
 
+        /// <summary>
+        /// Копирование с обработчиком исключений
+        /// </summary>
+        /// <param name="copyFinishedCallback"></param>
+        /// <returns></returns>
         public async Task CopyAllAsync(Action<AsyncActionResult> copyFinishedCallback)
         {
             if (copyFinishedCallback == null)
                 throw new ArgumentNullException(paramName: nameof(copyFinishedCallback));
 
-            CheckSourceDirectoryForContent();
-
             try
             {
+                CheckSourceDirectoryForContent();
+
                 // Сначала удалим все файлы в паке, куда копируем
                 await _directoryHelper.RemoveAllContentAsync(_targetDirectory);
 

@@ -45,8 +45,17 @@ namespace Logic.Arhivator
             {
                 try
                 {
-                    await ArchiveAsync(archiveFolderNamePostfix);
-                    
+                    var archiveFolderName = GetNewFolderNameFromCurrentDate(archiveFolderNamePostfix);
+
+                    string archiveDirectoryPath = Path.Combine(_archDirectoryRootPath, archiveFolderName);
+
+                    if (Directory.Exists(archiveDirectoryPath))
+                        throw new InvalidOperationException($@"Папка архива {archiveFolderName} уже сущестует. Не могу архивировать");
+
+                    var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath, _directoryHelper);
+
+                    await filesProvider.CopyAllAsync();
+
                     archiveFinishedCallback(AsyncActionResult.Success());
                 }
                 catch (Exception exception)
@@ -54,20 +63,6 @@ namespace Logic.Arhivator
                     archiveFinishedCallback(AsyncActionResult.Fail(exception));
                 }
             });
-        }
-
-        private async Task ArchiveAsync(string archiveFolderNamePostfix = null)
-        {
-            var archiveFolderName = GetNewFolderNameFromCurrentDate(archiveFolderNamePostfix);
-
-            string archiveDirectoryPath = Path.Combine(_archDirectoryRootPath, archiveFolderName);
-
-            if (Directory.Exists(archiveDirectoryPath))
-                throw new InvalidOperationException($@"Папка архива {archiveFolderName} уже сущестует. Не могу архивировать");
-
-            var filesProvider = new FilesReplicator(_siteDirectoryPath, archiveDirectoryPath, _directoryHelper);
-
-            await filesProvider.CopyAllAsync();
         }
 
         public static string GetNewFolderNameFromCurrentDate(string archiveFolderNamePostfix = null)
