@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WebsiteReleaseHelper"
         mc:Ignorable="d"
-        Title="Сайтонакатор 3000" MinHeight="633" Height="633" MinWidth="608" Width="608" WindowStartupLocation="CenterScreen">
+        Title="Сайтонакатор 3000" MinHeight="633" Height="556.419" MinWidth="608" Width="608" WindowStartupLocation="CenterScreen">
     <Grid Margin="0,0,2,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="225*"/>
@@ -39,16 +39,16 @@
                     <ColumnDefinition Width="66*"/>
                     <ColumnDefinition Width="95*"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Название:" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
-                <TextBlock Margin="11,15,10,0" Name="TextBlock_DisplayableName" Background="#FFE6E6E6" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Column="1" Height="16"/>
-                <Label Content="Папка деплоя:" Margin="10,41,10,0" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
-                <TextBlock Name="TextBlock_DeployDirectoryPath" Background="#FFE6E6E6" Margin="10,72,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                <Label Content="Папка сайта:" Margin="10,93,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                <TextBlock Margin="10,124,10,0" Name="TextBlock_WebsiteRootPath" Background="#FFE6E6E6" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                <Label Content="Урлы сайта" Margin="10,145,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                <TextBlock Background="#FFE6E6E6" Margin="10,176,10,0" Name="TextBlock_WebsiteUrls" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-                <Button Content="Открыть папку деплоя" Name="Button_OpenDeployDirectory" Margin="10,197,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Click="Button_OpenDeployDirectory_OnClick"/>
-                <Button Content="Открыть папку сайта" Name="Button_OpenWebsiteDirectory" Margin="10,222,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Click="Button_OpenWebsiteDirectory_OnClick"/>
+                <Label Content="Название:" Margin="10,10,10,0" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
+                <TextBlock Margin="10,36,10,0" Name="TextBlock_DisplayableName" Background="#FFE6E6E6" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="16" Grid.ColumnSpan="2"/>
+                <Label Content="Папка деплоя:" Margin="10,57,10,0" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
+                <TextBlock Name="TextBlock_DeployDirectoryPath" Background="#FFE6E6E6" Margin="10,83,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                <Label Content="Папка сайта:" Margin="10,104,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                <TextBlock Margin="10,130,10,0" Name="TextBlock_WebsiteRootPath" Background="#FFE6E6E6" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                <Label Content="Урлы сайта" Margin="10,151,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                <TextBlock Background="#FFE6E6E6" Margin="10,177,10,0" Name="TextBlock_WebsiteUrls" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+                <Button Content="Открыть папку деплоя" Name="Button_OpenDeployDirectory" Margin="10,198,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Click="Button_OpenDeployDirectory_OnClick"/>
+                <Button Content="Открыть папку сайта" Name="Button_OpenWebsiteDirectory" Margin="10,223,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Click="Button_OpenWebsiteDirectory_OnClick"/>
             </Grid>
         </GroupBox>
         <Label Content="Список нод" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>

@@ -49,6 +49,8 @@ namespace Logic.IoProviders
             if (copyFinishedCallback == null)
                 throw new ArgumentNullException(paramName: nameof(copyFinishedCallback));
 
+            CheckSourceDirectoryForContent();
+
             try
             {
                 // Сначала удалим все файлы в паке, куда копируем
