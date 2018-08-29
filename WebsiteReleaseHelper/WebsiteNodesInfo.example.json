@@ -9,6 +9,9 @@
     // Папка сайта, в которой содержатся подпапки с файлами проекта и архивами
     "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\KaspiHelpTest",
 
+    // Имя сервера, необходимое для остановки IIS на нем
+    "ServerMachineName": "kaspihelpt-1",
+
     // Урлы сайта, чтоб запустить в браузере
     "WebsiteUrls": [
       "http://kaspihelpt-1/guide"
@@ -19,6 +22,7 @@
     "DisplayableName": "kaspihelpt-1-81",
     "DeployDirectoryPath": "\\\\kaspihelpt-1\\exch\\web",
     "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\kaspihelpt-1-81",
+    "ServerMachineName": "kaspihelpt-1",
     "WebsiteUrls": [
       "http://kaspihelpt-1:81/guide"
     ]
@@ -28,6 +32,7 @@
     "DisplayableName": "kaspihelpt-1-83",
     "DeployDirectoryPath": "\\\\kaspihelpt-1\\exch\\web",
     "WebsiteRootPath": "\\\\kaspihelpt-1\\c$\\projects\\kaspihelpt-1-83",
+    "ServerMachineName": "kaspihelpt-1",
     "WebsiteUrls": [
       "http://kaspihelpt-1:83/guide",
       "http://kaspihelpt-1:84/guide"

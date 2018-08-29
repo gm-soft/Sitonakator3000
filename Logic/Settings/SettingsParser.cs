@@ -44,6 +44,9 @@ namespace Logic.Settings
 
                 ThrowErrorIfEmptyValue(websiteNodeData.DisplayableName, indexForMessages, "Не указано имя ноды");
 
+                ThrowErrorIfEmptyValue(websiteNodeData.ServerMachineName, indexForMessages, 
+                    "Не указано имя сервера для остановки/запуска IIS");
+
                 ThrowErrorIfEmptyValue(websiteNodeData.DeployDirectoryPath, indexForMessages, 
                     "Не указана папка деплоя, откуда будут копироваться файлы для сайта");
 

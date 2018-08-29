@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Logic.Arhivator;
 using Logic.IoProviders;
+using Logic.Server;
 using Logic.Settings;
 
 namespace Logic
@@ -21,6 +23,8 @@ namespace Logic
             _websiteUrls = nodeData.WebsiteUrls;
 
             DirectoryHelper = new DirectoryHelper(_globalInfo.SpecificContentFolderNames());
+
+            _iisServer = new IisServer(nodeData.ServerMachineName);
         }
 
         private readonly IGlobalInfo _globalInfo;
@@ -44,8 +48,11 @@ namespace Logic
         /// Урлы сайта, которые нужно открыть в браузере, чтобы запустить ноды
         /// </summary>
         private readonly IReadOnlyCollection<string> _websiteUrls;
-
         public string WebsiteUrlsAsString => string.Join(", ", _websiteUrls);
+
+        private readonly IisServer _iisServer;
+        public string ServerMachineName => _iisServer.ToString();
+
 
         protected DirectoryHelper DirectoryHelper { get; }
 
@@ -72,6 +79,16 @@ namespace Logic
             var filesProvider = new FilesReplicator(DeployDirectoryPath, copyTargetDirectory, DirectoryHelper);
 
             await filesProvider.CopyAllAsync(copyFinishedCallback);
+        }
+
+        public async void StopServerAsync(Action<AsyncActionResult> callback)
+        {
+            await _iisServer.StopAsync(callback);
+        }
+
+        public async void StartServerAsync(Action<AsyncActionResult> callback)
+        {
+            await _iisServer.StartAsync(callback);
         }
 
         public void OpenDeployDirectory()

@@ -55,6 +55,7 @@
     <Compile Include="IGlobalInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\IisServer.cs" />
+    <Compile Include="Server\IisServerException.cs" />
     <Compile Include="Settings\SettingsParser.cs" />
     <Compile Include="Settings\SettingsParserException.cs" />
     <Compile Include="Settings\WebsiteNodeData.cs" />

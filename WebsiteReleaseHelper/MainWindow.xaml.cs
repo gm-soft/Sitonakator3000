@@ -53,6 +53,7 @@ namespace WebsiteReleaseHelper
             TextBlock_DeployDirectoryPath.Text = _currentSiteInstance.DeployDirectoryPath;
             TextBlock_WebsiteRootPath.Text = _currentSiteInstance.WebsiteRootPath;
             TextBlock_WebsiteUrls.Text = _currentSiteInstance.WebsiteUrlsAsString;
+            TextBlock_ServerMachineName.Text = _currentSiteInstance.ServerMachineName;
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace WebsiteReleaseHelper
             if (string.IsNullOrEmpty(archiveFolderPostfix))
                 archiveFolderPostfix = null;
 
-            StartPrimaryInstanceAsyncOperations("Начинаю процесс архивации");
+            StartAsyncOperations("Начинаю процесс архивации");
 
             _currentSiteInstance.Archive(archiveFolderPostfix, archiveFinishedCallback: (archiveResult) =>
             {
@@ -76,7 +77,7 @@ namespace WebsiteReleaseHelper
                         ? $"Архив сделан успешно"
                         : $"Ошибка при архивировании: {archiveResult.Exception.Message}";
 
-                    StopPrimaryInstanceAsyncOperations(messageToShow);
+                    StopAsyncOperations(messageToShow);
                 });
             });
         }
@@ -85,7 +86,7 @@ namespace WebsiteReleaseHelper
         {
             ThrowErrorIfNoSelectedInstance();
 
-            StartPrimaryInstanceAsyncOperations("Начинаю копирование файлов деплоя");
+            StartAsyncOperations("Начинаю копирование файлов деплоя");
 
             _currentSiteInstance.CopyFilesFromDeployDirectory((copyResult) =>
             {
@@ -95,12 +96,12 @@ namespace WebsiteReleaseHelper
                         ? "Копирование завершено"
                         : $"Произошла ошибка при копировании: {copyResult.Exception.Message}";
 
-                    StopPrimaryInstanceAsyncOperations(messageToShow);
+                    StopAsyncOperations(messageToShow);
                 });
             });
         }
 
-        private void StartPrimaryInstanceAsyncOperations(string messageToShow)
+        private void StartAsyncOperations(string messageToShow)
         {
             _primaryInstanceProgressBar.Start();
 
@@ -108,10 +109,11 @@ namespace WebsiteReleaseHelper
 
             Button_ArhivePrimaryInstance.IsEnabled = false;
             Button_CopyPrimaryNewFiles.IsEnabled = false;
+            Button_OpenPage.IsEnabled = false;
             ListBox_WebsiteNodes.IsEnabled = false;
         }
 
-        private void StopPrimaryInstanceAsyncOperations(string messageToShow)
+        private void StopAsyncOperations(string messageToShow)
         {
             _primaryInstanceProgressBar.Stop();
 
@@ -119,6 +121,7 @@ namespace WebsiteReleaseHelper
 
             Button_ArhivePrimaryInstance.IsEnabled = true;
             Button_CopyPrimaryNewFiles.IsEnabled = true;
+            Button_OpenPage.IsEnabled = true;
             ListBox_WebsiteNodes.IsEnabled = true;
         }
 
@@ -151,16 +154,11 @@ namespace WebsiteReleaseHelper
             FillInfoForCurrentWebsite();
         }
 
-        private async void Button_OpenDeployDirectory_OnClick(object sender, RoutedEventArgs e)
+        private void Button_OpenDeployDirectory_OnClick(object sender, RoutedEventArgs e)
         {
-            //ThrowErrorIfNoSelectedInstance();
+            ThrowErrorIfNoSelectedInstance();
 
-            //_currentSiteInstance.OpenDeployDirectory();
-
-            var iis = new IisServer(@"kaspihelpt-1");
-            await iis.StopAsync();
-
-            await iis.StartAsync();
+            _currentSiteInstance.OpenDeployDirectory();
         }
 
         private void Button_OpenWebsiteDirectory_OnClick(object sender, RoutedEventArgs e)
@@ -168,6 +166,44 @@ namespace WebsiteReleaseHelper
             ThrowErrorIfNoSelectedInstance();
 
             _currentSiteInstance.OpenWebsiteRootDirectory();
+        }
+
+        private void Button_StartIIS_OnClick(object sender, RoutedEventArgs e)
+        {
+            ThrowErrorIfNoSelectedInstance();
+
+            StartAsyncOperations("Запускаю IIS");
+
+            _currentSiteInstance.StartServerAsync(result =>
+            {
+                UpdateInUiThread(() =>
+                {
+                    var messageToShow = result.Result
+                        ? $"IIS запущен"
+                        : $"Ошибка при старте IIS: {result.Exception.Message}";
+
+                    StopAsyncOperations(messageToShow);
+                });
+            });
+        }
+
+        private void Button_StopIIS_OnClick(object sender, RoutedEventArgs e)
+        {
+            ThrowErrorIfNoSelectedInstance();
+
+            StartAsyncOperations("Останавливаю IIS");
+
+            _currentSiteInstance.StopServerAsync(result =>
+            {
+                UpdateInUiThread(() =>
+                {
+                    var messageToShow = result.Result
+                        ? $"IIS остановлен"
+                        : $"Ошибка при остановке IIS: {result.Exception.Message}";
+
+                    StopAsyncOperations(messageToShow);
+                });
+            });
         }
     }
 }

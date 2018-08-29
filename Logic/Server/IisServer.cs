@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Management.Automation;
 using System.Threading.Tasks;
+using Logic.Arhivator;
 
 namespace Logic.Server
 {
-    public class IisServer
+    internal class IisServer
     {
         private readonly string _remoteServerComputerName;
 
@@ -17,17 +16,51 @@ namespace Logic.Server
                                         ?? throw new ArgumentNullException(paramName: nameof(remoteServerComputerName));
         }
 
-        public async Task StopAsync()
+        internal async Task StopAsync(Action<AsyncActionResult> asyncActionCallback)
         {
-            await RunStartOrStopCommandAsync("stop");
+            try
+            {
+                string result = await RunStartOrStopCommandAsync("stop");
+
+                AsyncActionResult actionResult = IsSuccessfull(result)
+                    ? AsyncActionResult.Success()
+                    : AsyncActionResult.Fail(new IisServerException($"Не удалось остановить сервер: {result}"));
+
+                asyncActionCallback(actionResult);
+            }
+            catch (Exception exception)
+            {
+                AsyncActionResult.Fail(new IisServerException($"Остановка сервера закончилась ошибкой: {exception.Message}", exception));
+            }
+            
         }
 
-        public async Task StartAsync()
+        internal async Task StartAsync(Action<AsyncActionResult> asyncActionCallback)
         {
-            await RunStartOrStopCommandAsync("start");
+            try
+            {
+                string result = await RunStartOrStopCommandAsync("start");
+
+                AsyncActionResult actionResult = IsSuccessfull(result)
+                    ? AsyncActionResult.Success()
+                    : AsyncActionResult.Fail(new IisServerException($"Не удалось запустить сервер: {result}"));
+
+                asyncActionCallback(actionResult);
+            }
+            catch (Exception exception)
+            {
+                AsyncActionResult.Fail(new IisServerException($"Запуск сервера закончился ошибкой: {exception.Message}", exception));
+            }
         }
 
-        private async Task RunStartOrStopCommandAsync(string command)
+        private bool IsSuccessfull(string outputText)
+        {
+            const string successfulTextPart = @"successfully";
+
+            return outputText.ToLowerInvariant().Contains(successfulTextPart);
+        }
+
+        private async Task<string> RunStartOrStopCommandAsync(string command)
         {
             // текст команды взят отсюда https://gallery.technet.microsoft.com/scriptcenter/Powershell-script-to-363dd543\
             // invoke-command -computername $serverName {cd C:\Windows\System32\; ./cmd.exe /c "iisreset /noforce /stop" }
@@ -35,7 +68,7 @@ namespace Logic.Server
             var script = @"invoke-command -computername " + _remoteServerComputerName + 
                          @" {cd C:\Windows\System32\; ./cmd.exe /c ""iisreset /noforce /" + command + @""" }";
 
-            await RunPowerShellScriptAsync(script);
+            return await RunPowerShellScriptAsync(script);
         }
 
         // Код взят отсюда https://stackoverflow.com/a/41963553
@@ -66,6 +99,11 @@ namespace Logic.Server
                     return text;
                 }
             });
+        }
+
+        public override string ToString()
+        {
+            return _remoteServerComputerName;
         }
     }
 }

@@ -10,6 +10,8 @@ namespace Logic.Settings
 
         public string WebsiteRootPath { get; set; }
 
+        public string ServerMachineName { get; set; }
+
         public List<string> WebsiteUrls { get; set; }
     }
 }
