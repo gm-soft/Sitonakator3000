@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Logic;
+using Logic.Server;
 using Logic.Settings;
 using WebsiteReleaseHelper.FormsControlWrappers;
 
@@ -150,11 +151,16 @@ namespace WebsiteReleaseHelper
             FillInfoForCurrentWebsite();
         }
 
-        private void Button_OpenDeployDirectory_OnClick(object sender, RoutedEventArgs e)
+        private async void Button_OpenDeployDirectory_OnClick(object sender, RoutedEventArgs e)
         {
-            ThrowErrorIfNoSelectedInstance();
+            //ThrowErrorIfNoSelectedInstance();
 
-            _currentSiteInstance.OpenDeployDirectory();
+            //_currentSiteInstance.OpenDeployDirectory();
+
+            var iis = new IisServer(@"kaspihelpt-1");
+            await iis.StopAsync();
+
+            await iis.StartAsync();
         }
 
         private void Button_OpenWebsiteDirectory_OnClick(object sender, RoutedEventArgs e)
