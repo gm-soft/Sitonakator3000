@@ -110,6 +110,10 @@ namespace WebsiteReleaseHelper
             Button_ArhivePrimaryInstance.IsEnabled = false;
             Button_CopyPrimaryNewFiles.IsEnabled = false;
             Button_OpenPage.IsEnabled = false;
+
+            Button_StartIIS.IsEnabled = false;
+            Button_StopIIS.IsEnabled = false;
+
             ListBox_WebsiteNodes.IsEnabled = false;
         }
 
@@ -122,6 +126,10 @@ namespace WebsiteReleaseHelper
             Button_ArhivePrimaryInstance.IsEnabled = true;
             Button_CopyPrimaryNewFiles.IsEnabled = true;
             Button_OpenPage.IsEnabled = true;
+
+            Button_StartIIS.IsEnabled = true;
+            Button_StopIIS.IsEnabled = true;
+
             ListBox_WebsiteNodes.IsEnabled = true;
         }
 
